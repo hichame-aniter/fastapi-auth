@@ -6,11 +6,11 @@ import bcrypt
 
 class User(BaseModel):
 
-    _users: ClassVar[list['User']] =  [] #PrivateAttr(default_factory=list)
+    _users: ClassVar[list['User']] =  []
 
     name: str
     email: str # need validation
-    _hashed_password: bytes = ""
+    __hashed_password: bytes = ""
     is_email_verified: bool = False
     is_kyc_verified: bool = False
     is_banned: bool = False
@@ -24,7 +24,7 @@ class User(BaseModel):
     @classmethod
     def create_user(cls, user: 'User', password: str) -> 'User':
         hashed_password = cls.hash_password(password)
-        user._hashed_password = hashed_password
+        user.__hashed_password = hashed_password
         cls._users.append(user)
         return user
     
@@ -41,10 +41,10 @@ class User(BaseModel):
         raise HTTPException(status_code=404, detail="User not found.")
 
     @classmethod
-    def login_user(cls, email: str, password: str):
+    def login_user(cls, email: str, password: str) -> 'User':
         user = cls.get_user(email)
         password_bytes = password.encode('utf-8')
-        hashed_password = user._hashed_password
+        hashed_password = user.__hashed_password
         if bcrypt.checkpw(password_bytes, hashed_password):
             return user
         raise HTTPException(status_code=401, detail="Email or Password Incorrect")
@@ -80,3 +80,5 @@ class User(BaseModel):
         if user.is_banned:
             user.is_banned = False
         return user
+
+    
