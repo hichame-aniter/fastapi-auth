@@ -42,7 +42,7 @@ class User(BaseModel):
 
     @classmethod
     def login_user(cls, email: str, password: str) -> 'User':
-        user = cls.get_user(email)
+        user = cls.get_user(user_id=None, email=email)
         password_bytes = password.encode('utf-8')
         hashed_password = user.__hashed_password
         if bcrypt.checkpw(password_bytes, hashed_password):
